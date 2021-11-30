@@ -12,6 +12,6 @@ This example app uses `useFind` and `usePagination` from Feathers-Pinia.
 
 If everything went well, you'll see the app, above.
 
-<img src="https://feathers-pinia.pages.dev/feathers-pinia.png" height="360" style="object-fit: scale-down;"/>
-
 Learn more about Feathers-Pinia at [https://feathers-pinia.pages.dev](https://feathers-pinia.pages.dev)
+
+<img src="https://feathers-pinia.pages.dev/feathers-pinia.png" height="360" style="object-fit: scale-down;"/>
