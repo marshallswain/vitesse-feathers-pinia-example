@@ -12,8 +12,16 @@ declare module 'vue' {
     CarbonPedestrian: typeof import('~icons/carbon/pedestrian')['default']
     CarbonSun: typeof import('~icons/carbon/sun')['default']
     CarbonWarning: typeof import('~icons/carbon/warning')['default']
+    ClassSelector: typeof import('./components/ClassSelector.vue')['default']
+    FeatherArrowLeft: typeof import('~icons/feather/arrow-left')['default']
+    FeatherIconsArrowLeft: typeof import('~icons/feather/icons-arrow-left')['default']
     Footer: typeof import('./components/Footer.vue')['default']
+    PaginationButton: typeof import('./components/PaginationButton.vue')['default']
     README: typeof import('./components/README.md')['default']
+    RowsPerPageSelector: typeof import('./components/RowsPerPageSelector.vue')['default']
+    TextInput: typeof import('./components/TextInput.vue')['default']
+    UserRow: typeof import('./components/UserRow.vue')['default']
+    UserSearch: typeof import('./components/UserSearch.vue')['default']
   }
 }
 

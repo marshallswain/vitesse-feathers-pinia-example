@@ -1,58 +1,72 @@
 <script setup lang="ts">
-import { useUserStore } from '~/stores/user'
+import { useFind, usePagination } from 'feathers-pinia'
+import { useUsers } from '~/stores/user'
 
-const user = useUserStore()
-const name = ref(user.savedName)
+const userStore = useUsers()
 
-const router = useRouter()
-const go = () => {
-  if (name.value)
-    router.push(`/hi/${encodeURIComponent(name.value)}`)
-}
+const selectedClass = ref(null)
+const search = ref('')
 
-const { t } = useI18n()
+const current = ref(null)
+const setCurrent = (item: typeof userStore.Model) => current.value = item
+
+const limit = ref(5)
+const skip = ref(0)
+
+const pagination = computed({
+  get: () => ({ $limit: limit.value, $skip: skip.value }),
+  set: ({ $limit, $skip }) => {
+    limit.value = $limit
+    skip.value = $skip
+  },
+})
+const params = computed(() => {
+  const nameFilter = { name: { $regex: search.value, $options: 'igm' } }
+  const classFilter = { class: selectedClass.value }
+
+  return {
+    query: {
+      ...pagination.value,
+      ...(selectedClass.value ? classFilter : null),
+      ...nameFilter,
+    },
+    paginate: true,
+  }
+})
+const { items: users, latestQuery } = useFind({ model: userStore.Model, params })
+const { next, prev, canNext, canPrev, currentPage, pageCount, toPage } = usePagination(pagination, latestQuery)
 </script>
 
 <template>
-  <div>
-    <p class="text-4xl">
-      <carbon-campsite class="inline-block" />
-    </p>
-    <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse" target="_blank">
-        Vitesse
-      </a>
-    </p>
-    <p>
-      <em class="text-sm opacity-75">{{ t('intro.desc') }}</em>
-    </p>
+  <div class="text-left">
+    <div class="flex flex-row items-center space-x-1">
+      <RowsPerPageSelector v-model:rows-per-page="limit" />
+      <ClassSelector v-model:school-class="selectedClass" />
+      <TextInput v-model:value="search" label="Search by Name" placeholder="name" />
+    </div>
 
-    <div class="py-4" />
+    <!-- User Table -->
+    <table class="table table-zebra w-130 mt-4">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Class</th>
+        </tr>
+      </thead>
+      <tbody>
+        <UserRow v-for="user in users" :key="user.id" :user="user" :class="{ active: user === current }" @click="() => setCurrent(user)" />
+      </tbody>
+    </table>
 
-    <input
-      id="input"
-      v-model="name"
-      :placeholder="t('intro.whats-your-name')"
-      :aria-label="t('intro.whats-your-name')"
-      type="text"
-      autocomplete="false"
-      p="x-4 y-2"
-      w="250px"
-      text="center"
-      bg="transparent"
-      border="~ rounded gray-200 dark:gray-700"
-      outline="none active:none"
-      @keydown.enter="go"
-    >
-    <label class="hidden" for="input">{{ t('intro.whats-your-name') }}</label>
-
-    <div>
-      <button
-        class="m-3 text-sm btn"
-        :disabled="!name"
-        @click="go"
-      >
-        {{ t('button.go') }}
+    <!-- Pagination -->
+    <div class="btn-group mt-4">
+      <button class="btn" :class="{'opacity-50 cursor-not-allowed': !canPrev}" @click="canPrev && prev()">
+        Previous
+      </button>
+      <PaginationButton v-for="page in pageCount" :key="page" :page="page" :current-page="currentPage" @click="toPage(page)" />
+      <button class="btn" :class="{'opacity-50 cursor-not-allowed': !canNext}" @click="canNext && next()">
+        Next
       </button>
     </div>
   </div>
