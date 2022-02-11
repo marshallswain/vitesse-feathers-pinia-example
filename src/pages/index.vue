@@ -10,23 +10,14 @@ const search = ref('')
 const current = ref(null)
 const setCurrent = (item: typeof userStore.Model) => current.value = item
 
-const limit = ref(5)
-const skip = ref(0)
-
-const pagination = computed({
-  get: () => ({ $limit: limit.value, $skip: skip.value }),
-  set: ({ $limit, $skip }) => {
-    limit.value = $limit
-    skip.value = $skip
-  },
-})
+const pagination = reactive({ $limit: 5, $skip: 0 })
 const params = computed(() => {
   const nameFilter = { name: { $regex: search.value, $options: 'igm' } }
   const classFilter = { class: selectedClass.value }
 
   return {
     query: {
-      ...pagination.value,
+      ...pagination,
       ...(selectedClass.value ? classFilter : null),
       ...nameFilter,
     },
@@ -40,7 +31,7 @@ const { next, prev, canNext, canPrev, currentPage, pageCount, toPage } = usePagi
 <template>
   <div class="text-left">
     <div class="flex flex-row items-center space-x-1">
-      <RowsPerPageSelector v-model:rows-per-page="limit" />
+      <RowsPerPageSelector v-model:rows-per-page="pagination.$limit" />
       <ClassSelector v-model:school-class="selectedClass" />
       <TextInput v-model:value="search" label="Search by Name" placeholder="name" />
     </div>

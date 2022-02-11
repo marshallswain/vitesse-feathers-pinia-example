@@ -5,7 +5,8 @@ import { defineStore, BaseModel } from './pinia'
 export class User extends BaseModel {}
 
 const servicePath = 'users'
-export const useUsers = defineStore({ servicePath, Model: User })
+const whitelist = ['$regex', '$options']
+export const useUsers = defineStore({ servicePath, Model: User, whitelist })
 
 api.service(servicePath).hooks({})
 
@@ -57,5 +58,5 @@ api.use(servicePath, memory({
     default: 5,
     max: 20,
   },
-  allow: ['$regex', '$options'],
+  whitelist,
 }))
